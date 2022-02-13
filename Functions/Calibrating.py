@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # coding=utf8
 import sys
-sys.path.append('/home/pi/ArmPi/')
+sys.path.append('ArmPi/')
 import cv2
 import time
 import Camera
