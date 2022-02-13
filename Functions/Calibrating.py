@@ -2,6 +2,7 @@
 # coding=utf8
 import sys
 sys.path.append('~/ArmPi/')
+sys.path.append('/home/pi/ArmPi/')
 import cv2
 import time
 import Camera
