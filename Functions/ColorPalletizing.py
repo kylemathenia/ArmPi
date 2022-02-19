@@ -34,26 +34,26 @@ def setTargetColor(target_color):
     __target_color = target_color
     return (True, ())
 
-# 找出面积最大的轮廓
-# 参数为要比较的轮廓的列表
+# Find the contour with the largest area
+# argument is a list of contours to compare
 def getAreaMaxContour(contours):
     contour_area_temp = 0
     contour_area_max = 0
     area_max_contour = None
 
-    for c in contours:  # 历遍所有轮廓
-        contour_area_temp = math.fabs(cv2.contourArea(c))  # 计算轮廓面积
+    for c in contours:  # iterate over all contours
+        contour_area_temp = math.fabs(cv2.contourArea(c))  # Calculate the contour area
         if contour_area_temp > contour_area_max:
             contour_area_max = contour_area_temp
-            if contour_area_temp > 300:  # 只有在面积大于300时，最大面积的轮廓才是有效的，以过滤干扰
+            if contour_area_temp > 300:  # The contour with the largest area is valid only if the area is greater than 300 to filter out the noise
                 area_max_contour = c
 
-    return area_max_contour, contour_area_max  # 返回最大的轮廓
+    return area_max_contour, contour_area_max  # returns the largest contour
 
-# 夹持器夹取时闭合的角度
+# The angle at which the gripper closes when gripping
 servo1 = 500
 
-# 初始位置
+# initial position
 def initMove():
     Board.setBusServoPulse(1, servo1 - 50, 300)
     Board.setBusServoPulse(2, 500, 500)
@@ -65,7 +65,7 @@ def setBuzzer(timer):
     time.sleep(timer)
     Board.setBuzzer(0)
 
-#设置扩展板的RGB灯颜色使其跟要追踪的颜色一致
+#Set the color of the RGB lights of the expansion board to match the color to be tracked
 def set_rgb(color):
     if color == "red":
         Board.RGB.setPixelColor(0, Board.PixelColor(255, 0, 0))
@@ -93,7 +93,7 @@ move_square = False
 detect_color = 'None'
 start_pick_up = False
 start_count_t1 = True
-# 放置坐标
+# placement coordinates
 coordinate = {
     'red':   (-15 + 1, -7 - 0.5, 1.5),
     'green': (-15 + 1, -7 - 0.5, 1.5),
@@ -264,7 +264,7 @@ def move():
                 time.sleep(1.5)               
             time.sleep(0.01)
 
-# 运行子线程
+# run child thread
 th = threading.Thread(target=move)
 th.setDaemon(True)
 th.start()
@@ -300,7 +300,7 @@ def run(img):
 
     frame_resize = cv2.resize(img_copy, size, interpolation=cv2.INTER_NEAREST)
     frame_gb = cv2.GaussianBlur(frame_resize, (11, 11), 11)
-    #如果检测到某个区域有识别到的物体，则一直检测该区域直到没有为止
+    #If an area is detected with a recognized object, the area is detected until there are none
     if get_roi and not start_pick_up:
         get_roi = False
         frame_gb = getMaskROI(frame_gb, roi, size)    
@@ -314,45 +314,45 @@ def run(img):
     if not start_pick_up:
         for i in color_range:
             if i in __target_color:
-                frame_mask = cv2.inRange(frame_lab, color_range[i][0], color_range[i][1])  # 对原图像和掩模进行位运算
-                opened = cv2.morphologyEx(frame_mask, cv2.MORPH_OPEN, np.ones((6, 6), np.uint8))  # 开运算
-                closed = cv2.morphologyEx(opened, cv2.MORPH_CLOSE, np.ones((6, 6), np.uint8))  # 闭运算
-                contours = cv2.findContours(closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)[-2]  # 找出轮廓
-                areaMaxContour, area_max = getAreaMaxContour(contours)  # 找出最大轮廓
+                frame_mask = cv2.inRange(frame_lab, color_range[i][0], color_range[i][1])  # Bitwise operations on the original image and mask
+                opened = cv2.morphologyEx(frame_mask, cv2.MORPH_OPEN, np.ones((6, 6), np.uint8))  # open operation
+                closed = cv2.morphologyEx(opened, cv2.MORPH_CLOSE, np.ones((6, 6), np.uint8))  # close operation
+                contours = cv2.findContours(closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)[-2]  # find the outline
+                areaMaxContour, area_max = getAreaMaxContour(contours)  # find the largest contour
                 if areaMaxContour is not None:
-                    if area_max > max_area:  # 找最大面积
+                    if area_max > max_area:  # find the largest area
                         max_area = area_max
                         color_area_max = i
                         areaMaxContour_max = areaMaxContour
-        if max_area > 2500:  # 有找到最大面积
+        if max_area > 2500:  # have found the largest area
             rect = cv2.minAreaRect(areaMaxContour_max)
             box = np.int0(cv2.boxPoints(rect))
             
-            roi = getROI(box) #获取roi区域
+            roi = getROI(box) #get roi region
             get_roi = True
 
-            img_centerx, img_centery = getCenter(rect, roi, size, square_length)  # 获取木块中心坐标
+            img_centerx, img_centery = getCenter(rect, roi, size, square_length)  # Get the coordinates of the center of the block
             
-            world_x, world_y = convertCoordinate(img_centerx, img_centery, size) #转换为现实世界坐标
+            world_x, world_y = convertCoordinate(img_centerx, img_centery, size) #Convert to real world coordinates
 
             if not start_pick_up:
                 cv2.drawContours(img, [box], -1, range_rgb[color_area_max], 2)
                 cv2.putText(img, '(' + str(world_x) + ',' + str(world_y) + ')', (min(box[0, 0], box[2, 0]), box[2, 1] - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, range_rgb[color_area_max], 1) #绘制中心点
-                distance = math.sqrt(pow(world_x - last_x, 2) + pow(world_y - last_y, 2)) #对比上次坐标来判断是否移动
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, range_rgb[color_area_max], 1) #draw center point
+                distance = math.sqrt(pow(world_x - last_x, 2) + pow(world_y - last_y, 2)) #Compare the last coordinates to determine whether to move
             last_x, last_y = world_x, world_y
 
             if not start_pick_up:
-                if color_area_max == 'red':  # 红色最大
+                if color_area_max == 'red':  # red max
                     color = 1
-                elif color_area_max == 'green':  # 绿色最大
+                elif color_area_max == 'green':  # green max
                     color = 2
-                elif color_area_max == 'blue':  # 蓝色最大
+                elif color_area_max == 'blue':  # blue max
                     color = 3
                 else:
                     color = 0
                 color_list.append(color)
-                # 累计判断
+                # Cumulative judgment
                 if distance < 0.5:
                     count += 1
                     center_list.extend((world_x, world_y))
@@ -372,8 +372,8 @@ def run(img):
                     center_list = []
                     count = 0
 
-                if len(color_list) == 3:  # 多次判断
-                    # 取平均值
+                if len(color_list) == 3:  # multiple judgments
+                    # take the average
                     color = int(round(np.mean(np.array(color_list))))
                     color_list = []
                     if color == 1:
