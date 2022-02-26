@@ -248,6 +248,16 @@ th = threading.Thread(target=move)
 th.setDaemon(True)
 th.start()    
 
+
+
+
+
+
+
+
+
+
+
 t1 = 0
 roi = ()
 center_list = []
@@ -287,7 +297,6 @@ def run(img):
     color_area_max = None
     max_area = 0
     areaMaxContour_max = 0
-    
     if not start_pick_up:
         for i in color_range:
             if i in __target_color:

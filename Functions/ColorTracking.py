@@ -84,10 +84,6 @@ def set_rgb(color):
         Board.RGB.setPixelColor(1, Board.PixelColor(0, 0, 0))
         Board.RGB.show()
 
-
-############## Same through here.
-
-
 count = 0
 track = False
 _stop = False
@@ -289,6 +285,16 @@ th = threading.Thread(target=move)
 th.setDaemon(True)
 th.start()
 
+
+
+
+
+
+
+
+
+
+
 t1 = 0
 roi = ()
 last_x, last_y = 0, 0
@@ -324,7 +330,6 @@ def run(img):
     if get_roi and start_pick_up:
         get_roi = False
         frame_gb = getMaskROI(frame_gb, roi, size)    
-    
     frame_lab = cv2.cvtColor(frame_gb, cv2.COLOR_BGR2LAB)  # Convert image to LAB space
     
     area_max = 0
