@@ -35,7 +35,6 @@ class ColorTracker():
             'blue': [0, 0, 0],
             'green': [0, 0, 0]
         }
-        # self.rects = 
 
     def get_detected_blocks(self):
         detected_colors = []

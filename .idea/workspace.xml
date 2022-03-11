@@ -5,10 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="aedaf6bf-de6e-42c3-8618-03c97dcc6fa2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Functions/ProjectFlightCode.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Functions/aruco_marker_detector.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ArmIK/Transform.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArmIK/Transform.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Functions/ColorTracking.py" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/ColorTracking.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Functions/ArmActions.py" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/ArmActions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Functions/ArmFlightCode.py" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/ArmFlightCode.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Functions/ArmPerception.py" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/ArmPerception.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Functions/perception.py" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/perception.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

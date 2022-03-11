@@ -3,6 +3,7 @@
 import sys
 
 from numpy import square
+
 sys.path.append('/home/pi/ArmPi/')
 import cv2
 import time
@@ -16,7 +17,6 @@ from CameraCalibration.CalibrationConfig import *
 import logging
 from ArmPerception import ColorTracker
 
-
 if sys.version_info.major == 2:
     print('Please run this program with python3!')
     sys.exit(0)
@@ -28,21 +28,17 @@ class ArmMover():
         self.AK = ArmIK()
         self.gripper_vals = {
             'cube': 500,
-            'open': 220, 
+            'open': 220,
             'wall': 600
-        } 
+        }
 
         self.heights = {
             'cube': {
-                'above':7,
-                'ground':1.5,
-                'drop':3, 
-                'drag':3
+                'ground': 1.5,
+                'truck': 8.5
             },
             'wall': {
-                'above': 12,
                 'ground': 7,
-                'drop': 7, 
                 'drag': 8
             }
         }
@@ -53,18 +49,19 @@ class ArmMover():
             'green': (0, 255, 0),
             'black': (0, 0, 0),
             'white': (255, 255, 255),
-            }
+        }
 
         # Coordinates of colored boxes on mat
-        self.coordinate = {
-            'red':   (-15 + 0.5, 12 - 0.5, 1.5),
-            'green': (-15 + 0.5, 6 - 0.5,  1.5),
-            'blue':  (-15 + 0.5, 0 - 0.5,  1.5),
-            'wall_block': (15, 15, 6), 
-            'wall_away': (15, 0, 7)
-            }
+        self.poses = {
+            'red': [[-15 + 0.5, 12 - 0.5], 0],
+            'green': [[-15 + 0.5, 6 - 0.5], 0],
+            'blue': [[-15 + 0.5, 0 - 0.5], 0],
+            'wall_block': [[15, 15], 0],
+            'wall_away': [[15, 0], 0]
+        }
 
     def go_to_initial_position(self):
+        ''' Send the robot to the "home" position.'''
         logging.info("Moving arm to initial position.")
         self.open_gripper()
         time.sleep(1.0)
@@ -83,10 +80,10 @@ class ArmMover():
 
         Board.RGB.show()
 
-    def check_if_reachable(self, coords, object):
-        # print("Checking if coords {} is reachable".format(coords))
-        # result = self.AK.setPitchRangeMoving((coords[0], coords[1], 7), -90, -90, 0)
-        result = self.AK.setPitchRangeMoving((coords[0], coords[1], self.heights[object]['ground']), -90, -90, 0)
+    def check_if_reachable(self, pose, object):
+        # print("Checking if pose {} is reachable".format(pose))
+        # result = self.AK.setPitchRangeMoving((pose[0], pose[1], 7), -90, -90, 0)
+        result = self.AK.setPitchRangeMoving((*pose[0], self.heights[object]['ground']), -90, -90, 0)
         if result == False:
             # print("not reachable.")
             return False
@@ -95,70 +92,78 @@ class ArmMover():
             return True
         # time.sleep(result[2]/1000)
 
-    def move_to_coords(self, x, y, height, duration=1.5):
+    def move_to_loc(self, loc, height, duration=1.5):
         '''Moves gripper to location provided
+        loc is [x, y], height is z
         optional input: duration of movement'''
-        self.AK.setPitchRangeMoving((x, y, height), -90, -90, 0)
+        self.AK.setPitchRangeMoving((loc[0], loc[1], height), -90, -90, 0)
         time.sleep(duration)
 
     def set_gripper_angle(self, angle):
+        '''Sets gripper angle based on angle of object wrt world x plane'''
         Board.setBusServoPulse(2, angle, 500)
         time.sleep(0.8)
 
-    def straighten_gripper(self, x, y, des_angle=0):
-        straight_angle = getAngle(x, y, des_angle)
+    def straighten_gripper(self, loc, des_angle=0):
+        '''Straightens gripper to 0 degrees, based on the location of the end effector in world
+        loc is [x, y]'''
+        straight_angle = getAngle(loc[0], loc[1], des_angle)
         self.set_gripper_angle(straight_angle)
 
-    def grasp_obj_at_coords(self, coords, object, lift=True):
-        '''Picks up the object located at the coordinates given'''
+    def grasp_obj_at_pose(self, pose, object, obj_height, lift=True):
+        '''Picks up the object located at the coordinates given (pose: [[x, y], angle])'''
         # move to above the object and open the gripper
-        self.move_to_coords(coords[0], coords[1], self.heights[object]['above'])
+        loc = pose[0]
+        self.move_to_loc(loc, self.heights[object][obj_height] + 8)
         self.open_gripper()
         # Set the gripper angle
-        gripper_angle = getAngle(*coords) #Calculate the angle by which the gripper needs to be rotated
+        gripper_angle = getAngle(*loc, pose[1])  # Calculate the angle by which the gripper needs to be rotated
         self.set_gripper_angle(gripper_angle)
         # Lower to around cube
-        self.move_to_coords(coords[0], coords[1], self.heights[object]['ground'])
+        self.move_to_loc(loc, self.heights[object][obj_height])
         self.close_gripper(object)
         if lift == True:
-            self.move_to_coords(coords[0], coords[1], self.heights[object]['above'])
+            self.move_to_loc(loc, self.heights[object][obj_height] + 8)
         else:
-            self.move_to_coords(coords[0], coords[1], self.heights[object]['drag'])
+            self.move_to_loc(loc, self.heights[object]['drag'])
 
     def wall_move(self, frompos='wall_block', topos='wall_away'):
-        og_coords = [self.coordinate[frompos][0], self.coordinate[frompos][1], 0]
-        new_coords = [self.coordinate[topos][0], self.coordinate[topos][1], 0]
-        self.grasp_obj_at_coords(og_coords, 'wall', lift=True)
-        # self.straighten_gripper(og_coords[0], og_coords[1])
-        self.move_to_coords(new_coords[0], new_coords[1], self.heights['wall']['drag'])
-        self.move_to_coords(new_coords[0], new_coords[1], self.heights['wall']['ground'], duration=0.5)
-        self.straighten_gripper(new_coords[0], new_coords[1])
+        '''Moves to or from initial position to the "away" position.'''
+        og_pose = self.poses[frompos]
+        new_pose = self.poses[topos]
+        self.grasp_obj_at_pose(og_pose, 'wall', lift=True)
+        # self.straighten_gripper(og_pose[0], og_pose[1])
+        self.move_to_loc(new_pose[0], self.heights['wall']['drag'])
+        self.move_to_loc(new_pose[0], self.heights['wall']['ground'], duration=0.5)
+        self.straighten_gripper(*new_pose[0])
         self.open_gripper()
-        self.move_to_coords(new_coords[0], new_coords[1], 12)
+        self.move_to_loc(*new_pose[0], 12)
 
     def drop_cube_in_square(self, square_color):
-        loc = self.coordinate[square_color]
+        loc = self.coordinate[square_color][0]
         self.drop_obj_in_loc(loc, 'cube')
 
-    def drop_obj_in_loc(self, loc, object):
+    def drop_obj_in_loc(self, loc, object, obj_height='ground'):
         '''Places an (already grasped) object in a location'''
         # move to location over object
-        self.move_to_coords(loc[0], loc[1], self.heights[object]['above'])
+        self.move_to_loc(loc, self.heights[object][obj_height] + 8)
         # set the angle to be straight
-        straight_angle = getAngle(loc[0], loc[1], -90)
+        straight_angle = getAngle(*loc, -90)
         self.set_gripper_angle(straight_angle)
 
         # drop object
-        self.move_to_coords(loc[0], loc[1], self.heights[object]['drop'], duration=0.5)
+        self.move_to_loc(loc, self.heights[object][obj_height] + 1, duration=0.5)
         self.open_gripper()
-        self.move_to_coords(loc[0], loc[1], self.heights[object]['above'], duration=0.8)
+        self.move_to_loc(loc, self.heights[object][obj_height] + 8, duration=0.8)
+
 
     def open_gripper(self):
         Board.setBusServoPulse(1, self.gripper_vals['open'], 500)
-        time.sleep(0.8)    
+        time.sleep(0.8)
 
     def close_gripper(self, object):
-        Board.setBusServoPulse(1, self.gripper_vals[object], 500)     
+        '''closes the gripper on object. Use 'cube' for cube or 'wall' for wall.'''
+        Board.setBusServoPulse(1, self.gripper_vals[object], 500)
         time.sleep(0.8)
 
 
@@ -167,7 +172,6 @@ if __name__ == "__main__":
     p = ColorTracker()
     m = ArmMover()
     m.go_to_initial_position()
-    time.sleep(0.5)    
-    # detected_blocks = p.get_detected_blocks()
+    time.sleep(0.5)
 
-    
+    # detected_blocks = p.get_detected_blocks()
