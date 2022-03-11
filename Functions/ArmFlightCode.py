@@ -24,7 +24,7 @@ if sys.version_info.major == 2:
 
 class Flight():
     def __init__(self):
-        self.aruco = ArucoMarkerDetector()
+        self.aruco = ArucoMarkerDetector(0)
         self.movement = ArmMover()
 
         self.fly()
