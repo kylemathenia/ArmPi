@@ -135,9 +135,9 @@ class ArmMover():
         # self.straighten_gripper(og_pose[0], og_pose[1])
         self.move_to_loc(new_pose[0], self.heights['wall']['drag'])
         self.move_to_loc(new_pose[0], self.heights['wall']['ground'], duration=0.5)
-        self.straighten_gripper(*new_pose[0])
+        self.straighten_gripper(new_pose[0])
         self.open_gripper()
-        self.move_to_loc(*new_pose[0], 12)
+        self.move_to_loc(new_pose[0], 12)
 
     def drop_cube_in_square(self, square_color):
         loc = self.coordinate[square_color][0]
