@@ -4,7 +4,7 @@
 # Libs
 import sys
 sys.path.append('/home/pi/ArmPi/')
-sys.path.append('/home/pi/ArmPi/Functions/aruco_marker')
+sys.path.append('/home/pi/ArmPi/Functions/aruco_marker/')
 import time
 import logging
 
