@@ -5,15 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="aedaf6bf-de6e-42c3-8618-03c97dcc6fa2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Functions/bus.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Functions/movement.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Functions/perception.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Functions/test.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Functions/ProjectFlightCode.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Functions/ColorPalletizing.py" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/ColorPalletizing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Functions/ColorSorting.py" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/ColorSorting.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ArmIK/Transform.py" beforeDir="false" afterPath="$PROJECT_DIR$/ArmIK/Transform.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Functions/ColorTracking.py" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/ColorTracking.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Functions/ImprovedColorTracking.py" beforeDir="false" afterPath="$PROJECT_DIR$/Functions/ImprovedColorTracking.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,7 +37,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/Functions/ColorPalletizing.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Functions" />
     <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/Functions/ColorPalletizing.py" />
   </component>
   <component name="RecentsManager">
@@ -99,6 +94,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
