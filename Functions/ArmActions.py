@@ -131,7 +131,7 @@ class ArmMover():
         '''Moves to or from initial position to the "away" position.'''
         og_pose = self.poses[frompos]
         new_pose = self.poses[topos]
-        self.grasp_obj_at_pose(og_pose, 'wall', lift=True)
+        self.grasp_obj_at_pose(og_pose, 'wall','ground', lift=True)
         # self.straighten_gripper(og_pose[0], og_pose[1])
         self.move_to_loc(new_pose[0], self.heights['wall']['drag'])
         self.move_to_loc(new_pose[0], self.heights['wall']['ground'], duration=0.5)
