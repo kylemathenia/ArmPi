@@ -23,8 +23,8 @@ class ArucoMarkerDetector():
         self.distortion_coefficients = np.array(
             [[-4.71751133e-01,  1.83250256e+00, -3.32571108e-04, -5.83076160e-04,  -1.55658703e+01]]
         )
-        # Length of side of marker in meters
-        self.marker_length = 0.02628 # about 1 inch
+        # Length of side of marker in cm
+        self.marker_length = 2.628 # about 1 inch
         # For visualizing detected marker
         self.visualize_results = visualize_results
         # Cleanup visualization
@@ -65,10 +65,20 @@ class ArucoMarkerDetector():
         Return a translation and rotation vector for the aruo marker."""
         _, _, _, rvecs, tvecs, _ = self.detectMarkerFull()
         if len(rvecs) > 0 and len(tvecs) > 0:
-            return rvecs[0], tvecs[0]
+            return rvecs[0][0], tvecs[0][0]
         else:
             logging.warning("No marker detected. Returning (None, None)")
             return None, None
+
+    def detectMarkerXYPosition(self)->np.ndarray:
+        """Detect the marker's xy position relative to the robot base
+        Return an [x,y] vector for the robot's position if the marker
+        is detected. Otherwise, return None"""
+        _, tvec = self.detectMarkerPose()
+        if tvec is not None:
+            return np.array([tvec[0]+1, -tvec[1] + 20])
+        else:
+            return None
 
     def cleanup(self)->None:
         cv2.destroyAllWindows()
@@ -81,6 +91,7 @@ if __name__ == "__main__":
         datefmt="%H:%M:%S")
 
     # Run detector
-    detector = ArucoMarkerDetector(camera_stream=2, visualize_results=True)
+    detector = ArucoMarkerDetector(camera_stream=0, visualize_results=True)
     while True:
-        detector.detectMarkerPose()
+        xypos = detector.detectMarkerXYPosition()
+        print("Position: {}".format(xypos))
