@@ -27,8 +27,11 @@ class Flight():
         self.movement.go_to_initial_position()
         self._wait_for_aruco()
         # Grab a block. Find aruco location.
+        print('here1')
         self.movement.grasp_obj_at_pose(self.movement.poses['blue'], 'cube', 'ground', lift=True)
+        print('here2')
         aruco_loc = self.aruco.detectMarkerXYPosition()
+        print('here3')
         # Place block on truck.
         self.movement.drop_obj_in_loc(aruco_loc, 'cube', obj_height='truck')
         self.movement.go_to_initial_position()
