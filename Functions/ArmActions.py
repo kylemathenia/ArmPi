@@ -27,7 +27,7 @@ class ArmMover():
     def __init__(self):
         self.AK = ArmIK()
         self.gripper_vals = {
-            'cube': 500,
+            'cube': 520,
             'open': 220,
             'wall': 600
         }
